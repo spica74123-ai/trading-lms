@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, memo } from 'react';
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 const TradingViewWidget = memo(() => {
     const container = useRef<HTMLDivElement>(null);
@@ -47,8 +49,14 @@ export default function ToolsPage() {
     return (
         <div className="min-h-screen bg-gray-950 text-white p-4 md:p-6 lg:p-8 font-sans">
             {/* Header */}
+            <div className="mb-6">
+                <Link href="/dashboard" className="inline-flex items-center text-gray-400 hover:text-white transition-colors group">
+                    <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                    Back to Dashboard
+                </Link>
+            </div>
             <div className="mb-8 border-b border-gray-800 pb-4">
-                <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-red-500">
                     Advanced Trading Tools
                 </h1>
                 <p className="text-gray-400 mt-2 text-sm md:text-base">
@@ -68,9 +76,9 @@ export default function ToolsPage() {
                 <div className="w-full xl:w-96 flex flex-col gap-6 h-full overflow-y-auto pr-2 custom-scrollbar">
 
                     {/* ATR Section */}
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg hover:border-blue-500/50 transition-colors">
+                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg hover:border-blue-700/50 transition-colors">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-blue-500/20 text-blue-400 p-2 rounded-lg">
+                            <div className="bg-blue-600/20 text-blue-500 p-2 rounded-lg">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                             </div>
                             <h2 className="text-xl font-bold text-white">ATR Indicator</h2>
@@ -80,24 +88,24 @@ export default function ToolsPage() {
                         </p>
                         <ul className="text-sm text-gray-400 space-y-3">
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400 font-bold mt-0.5">•</span>
+                                <span className="text-blue-500 font-bold mt-0.5">•</span>
                                 <span><span className="text-gray-300 font-medium">High ATR:</span> Indicates high volatility. Consider widening stop losses.</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400 font-bold mt-0.5">•</span>
+                                <span className="text-blue-500 font-bold mt-0.5">•</span>
                                 <span><span className="text-gray-300 font-medium">Low ATR:</span> Indicates low volatility, often seen in sideways markets.</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-blue-400 font-bold mt-0.5">•</span>
+                                <span className="text-blue-500 font-bold mt-0.5">•</span>
                                 <span><span className="text-gray-300 font-medium">Use Case:</span> Perfect for setting dynamic Stop Loss (e.g., 1.5x ATR).</span>
                             </li>
                         </ul>
                     </div>
 
                     {/* Fibonacci Section */}
-                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg hover:border-emerald-500/50 transition-colors">
+                    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg hover:border-red-600/50 transition-colors">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="bg-emerald-500/20 text-emerald-400 p-2 rounded-lg">
+                            <div className="bg-red-600/20 text-red-500 p-2 rounded-lg">
                                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                             </div>
                             <h2 className="text-xl font-bold text-white">Fibonacci Retracement</h2>
@@ -107,15 +115,15 @@ export default function ToolsPage() {
                         </p>
                         <ul className="text-sm text-gray-400 space-y-3">
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400 font-bold mt-0.5">•</span>
+                                <span className="text-red-500 font-bold mt-0.5">•</span>
                                 <span><span className="text-gray-300 font-medium">Key Levels:</span> 38.2%, 50.0%, and 61.8% are the most watched bounce zones.</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400 font-bold mt-0.5">•</span>
+                                <span className="text-red-500 font-bold mt-0.5">•</span>
                                 <span><span className="text-gray-300 font-medium">Uptrend:</span> Draw from Swing Low to Swing High to find buy/support zones.</span>
                             </li>
                             <li className="flex items-start gap-2">
-                                <span className="text-emerald-400 font-bold mt-0.5">•</span>
+                                <span className="text-red-500 font-bold mt-0.5">•</span>
                                 <span><span className="text-gray-300 font-medium">Downtrend:</span> Draw from Swing High to Swing Low to find sell/resistance zones.</span>
                             </li>
                         </ul>

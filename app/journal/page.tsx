@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { createBrowserClient } from "@supabase/ssr";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function TradingJournal() {
     const [trades, setTrades] = useState<any[]>([]);
@@ -100,7 +102,13 @@ export default function TradingJournal() {
     return (
         <div className="min-h-screen bg-gray-950 text-white p-6">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">
+                <div className="mb-6">
+                    <Link href="/dashboard" className="inline-flex items-center text-gray-400 hover:text-white transition-colors group">
+                        <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                        Back to Dashboard
+                    </Link>
+                </div>
+                <h1 className="text-3xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-red-500">
                     Trading Journal & Analytics
                 </h1>
 
@@ -124,7 +132,8 @@ export default function TradingJournal() {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-1 bg-gray-900 p-6 rounded-xl border border-gray-800 h-fit">
+                    {/* Add New Trade Form - moved to order-1 on mobile, order-1 on desktop anyway */}
+                    <div className="lg:col-span-1 bg-gray-900 p-6 rounded-xl border border-gray-800 h-fit order-1">
                         <h2 className="text-xl font-bold mb-4">Add New Trade</h2>
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
@@ -162,48 +171,51 @@ export default function TradingJournal() {
                                     className="w-full bg-gray-800 border-gray-700 rounded p-2 text-sm text-gray-400 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-500/10 file:text-blue-400 hover:file:bg-blue-500/20 border"
                                 />
                             </div>
-                            <button type="submit" disabled={uploading} className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded font-bold transition-colors disabled:opacity-50">
+                            <button type="submit" disabled={uploading} className="w-full bg-blue-700 hover:bg-blue-600 py-2 rounded font-bold transition-colors disabled:opacity-50 shadow-lg shadow-blue-700/20">
                                 {uploading ? "Saving..." : "Save Trade"}
                             </button>
                         </form>
                     </div>
 
-                    <div className="lg:col-span-2 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
-                        <table className="w-full text-left text-sm">
-                            <thead className="bg-gray-800 text-gray-400 uppercase text-xs">
-                                <tr>
-                                    <th className="p-4">Pair</th>
-                                    <th className="p-4">Side</th>
-                                    <th className="p-4">PnL</th>
-                                    <th className="p-4">Chart</th>
-                                    <th className="p-4">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-800">
-                                {trades.map((trade) => (
-                                    <tr key={trade.id} className="hover:bg-gray-800/50">
-                                        <td className="p-4 font-bold">{trade.pair}</td>
-                                        <td className={`p-4 font-bold ${trade.side === 'BUY' ? 'text-blue-400' : 'text-orange-400'}`}>{trade.side}</td>
-                                        <td className={`p-4 font-bold ${trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                                            {trade.pnl >= 0 ? '+' : ''}{parseFloat(trade.pnl).toFixed(2)}
-                                        </td>
-                                        <td className="p-4">
-                                            {trade.chart_url ? (
-                                                <a href={trade.chart_url} target="_blank" rel="noopener noreferrer" className="block w-10 h-10 rounded overflow-hidden border border-gray-700 hover:border-blue-400 transition-colors">
-                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                    <img src={trade.chart_url} alt="Chart" className="w-full h-full object-cover" />
-                                                </a>
-                                            ) : (
-                                                <span className="text-gray-600 text-xs italic">No chart</span>
-                                            )}
-                                        </td>
-                                        <td className="p-4">
-                                            <button onClick={() => deleteTrade(trade.id)} className="text-gray-500 hover:text-red-400">Delete</button>
-                                        </td>
+                    {/* Trade History Table - order-2 so it appears under the form on mobile */}
+                    <div className="lg:col-span-2 bg-gray-900 rounded-xl border border-gray-800 overflow-hidden order-2">
+                        <div className="overflow-x-auto">
+                            <table className="w-full text-left text-sm whitespace-nowrap">
+                                <thead className="bg-gray-800 text-gray-400 uppercase text-xs">
+                                    <tr>
+                                        <th className="p-4">Pair</th>
+                                        <th className="p-4">Side</th>
+                                        <th className="p-4">PnL</th>
+                                        <th className="p-4">Chart</th>
+                                        <th className="p-4">Actions</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody className="divide-y divide-gray-800">
+                                    {trades.map((trade) => (
+                                        <tr key={trade.id} className="hover:bg-gray-800/50">
+                                            <td className="p-4 font-bold">{trade.pair}</td>
+                                            <td className={`p-4 font-bold ${trade.side === 'BUY' ? 'text-blue-400' : 'text-orange-400'}`}>{trade.side}</td>
+                                            <td className={`p-4 font-bold ${trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
+                                                {trade.pnl >= 0 ? '+' : ''}{parseFloat(trade.pnl).toFixed(2)}
+                                            </td>
+                                            <td className="p-4">
+                                                {trade.chart_url ? (
+                                                    <a href={trade.chart_url} target="_blank" rel="noopener noreferrer" className="block w-10 h-10 rounded overflow-hidden border border-gray-700 hover:border-blue-400 transition-colors">
+                                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={trade.chart_url} alt="Chart" className="w-full h-full object-cover" />
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-gray-600 text-xs italic">No chart</span>
+                                                )}
+                                            </td>
+                                            <td className="p-4">
+                                                <button onClick={() => deleteTrade(trade.id)} className="text-gray-500 hover:text-red-400">Delete</button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

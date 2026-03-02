@@ -119,13 +119,13 @@ export async function POST(req: NextRequest) {
       <body>
           <div class="container">
               <div class="header">
-                  <h1>Trading LMS Masterclass</h1>
+                  <h1>Creative Investment Masterclass</h1>
               </div>
               <div class="content">
                   <h2>Congratulations, Trader! 🏆</h2>
                   <p>
                       You have officially completed all the requirements for the 
-                      <span class="highlight">Trading LMS Masterclass</span>. 
+                      <span class="highlight">Creative Investment Masterclass</span>. 
                       Your dedication to mastering the markets, understanding price action, and utilizing 
                       professional trading tools is truly outstanding.
                   </p>
@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
                   </div>
               </div>
               <div class="footer">
-                  <p>&copy; ${new Date().getFullYear()} Trading LMS Masterclass. All rights reserved.</p>
+                  <p>&copy; ${new Date().getFullYear()} Creative Investment Space. All rights reserved.</p>
                   <p>You received this email because you recently completed a course on our platform.</p>
               </div>
           </div>
@@ -152,7 +152,7 @@ export async function POST(req: NextRequest) {
     `;
 
         const data = await resend.emails.send({
-            from: 'Trading LMS Masterclass <onboarding@resend.dev>',
+            from: 'Creative Investment Space <onboarding@resend.dev>',
             to: [to_email],
             subject: 'Congratulations on your Trading Masterclass Certification! 🏆',
             html: emailHtml,
