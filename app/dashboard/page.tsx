@@ -8,6 +8,7 @@ import jsPDF from 'jspdf';
 import { BookOpen, LineChart, Target, Trophy, ArrowRight, LayoutGrid, ShieldCheck } from "lucide-react";
 import Image from "next/image";
 import { getUserRole } from "@/lib/roles";
+import DashboardHeader from "@/components/DashboardHeader";
 
 export default function DashboardPage() {
     const [userEmail, setUserEmail] = useState<string | null>(null);
@@ -111,14 +112,7 @@ export default function DashboardPage() {
             <div className="max-w-6xl mx-auto space-y-10">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-red-500">
-                            Welcome Back, {userEmail?.split('@')[0]}
-                        </h1>
-                        <p className="text-gray-400 mt-2">ยินดีต้อนรับเข้าสู่ระบบเรียนเทรดอัจฉริยะของคุณ</p>
-                    </div>
-                </div>
+                <DashboardHeader userName={userEmail?.split('@')[0]} />
 
                 {/* Progress Card */}
                 <div className="bg-gray-900 border border-gray-800 rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
