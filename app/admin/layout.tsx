@@ -10,7 +10,8 @@ import {
     BarChart3,
     ArrowLeft,
     Megaphone,
-    LayoutGrid
+    LayoutGrid,
+    Video
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -54,6 +55,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     const navLinks = [
         { href: "/admin/vip-requests", label: "อนุมัติสิทธิ์ VIP", icon: Users },
         { href: "/admin/courses", label: "จัดการบทเรียน", icon: BookOpen },
+        { href: "/admin/live-sessions", label: "จัดการ Live Session", icon: Video },
         { href: "/admin/reviews", label: "ตรวจรีวิวผลกำไร", icon: CheckSquare },
         { href: "/admin/rankings", label: "จัดการ Ranking", icon: BarChart3 },
         { href: "/admin/announcements", label: "จัดการประกาศ", icon: Megaphone },
