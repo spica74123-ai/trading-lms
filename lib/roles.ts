@@ -8,5 +8,5 @@ export async function getUserRole() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return "student";
     const { data } = await supabase.from('user_roles').select('roles(role_name)').eq('user_id', user.id).single();
-    return (data as any)?.roles?.role_name || "student";
+    return (data as { roles: { role_name: string } | null } | null)?.roles?.role_name || "student";
 }

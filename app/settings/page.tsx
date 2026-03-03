@@ -9,8 +9,13 @@ import { toast, Toaster } from "react-hot-toast"; // แนะนำให้ล
 export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
-    const [fullName, setFullName] = useState("");
-    const [avatarUrl, setAvatarUrl] = useState("");
+    interface Profile {
+        id: string;
+        full_name: string;
+        phone: string;
+        avatar_url: string;
+    }
+    const [profile, setProfile] = useState<Profile | null>(null);
 
     const supabase = createBrowserClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -19,27 +24,25 @@ export default function SettingsPage() {
 
     useEffect(() => {
         getProfile();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     async function getProfile() {
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
             const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-            if (data) {
-                setFullName(data.full_name || "");
-                setAvatarUrl(data.avatar_url || "");
-            }
+            setProfile(data);
         }
         setLoading(false);
     }
 
     // ฟังก์ชันอัปโหลดรูปภาพใหม่
-    async function uploadAvatar(event: any) {
+    async function handleUploadAvatar(e: React.ChangeEvent<HTMLInputElement>) {
         try {
             setUploading(true);
-            if (!event.target.files || event.target.files.length === 0) return;
+            const file = e.target.files?.[0];
+            if (!file) return;
 
-            const file = event.target.files[0];
             const { data: { user } } = await supabase.auth.getUser();
             const fileExt = file.name.split('.').pop();
             const filePath = `${user?.id}/${Math.random()}.${fileExt}`;
@@ -53,26 +56,30 @@ export default function SettingsPage() {
 
             // 2. ดึง Public URL มาเก็บไว้
             const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
-            setAvatarUrl(data.publicUrl);
+            if (profile) setProfile({ ...profile, avatar_url: data.publicUrl });
             toast.success("อัปโหลดรูปสำเร็จ! อย่าลืมกดบันทึกข้อมูล");
-        } catch (error: any) {
-            toast.error("Error: " + error.message);
+        } catch (error: unknown) {
+            toast.error("Error: " + (error instanceof Error ? error.message : "An unknown error occurred"));
         } finally {
             setUploading(false);
         }
     }
 
     async function handleSave() {
+        if (!profile) return;
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
         const { error } = await supabase.from('profiles').upsert({
             id: user?.id,
-            full_name: fullName,
-            avatar_url: avatarUrl,
+            full_name: profile.full_name,
+            avatar_url: profile.avatar_url,
             updated_at: new Date().toISOString(),
         });
 
-        if (error) toast.error("บันทึกไม่สำเร็จ!");
+        if (error) {
+            console.error("Save error:", error);
+            toast.error(`บันทึกไม่สำเร็จ: ${error.message}`);
+        }
         else toast.success("อัปเดตโปรไฟล์เรียบร้อย! ✨");
         setLoading(false);
     }
@@ -92,15 +99,15 @@ export default function SettingsPage() {
                     <div className="flex flex-col items-center gap-4">
                         <div className="relative group">
                             <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-blue-600/30 bg-gray-800 flex items-center justify-center">
-                                {avatarUrl ? (
-                                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                {profile?.avatar_url ? (
+                                    <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
                                     <User size={64} className="text-gray-600" />
                                 )}
                             </div>
                             <label className="absolute bottom-0 right-0 bg-red-600 p-2 rounded-full cursor-pointer hover:bg-red-700 transition-all shadow-lg border-2 border-gray-900">
                                 {uploading ? <Loader2 className="animate-spin" size={20} /> : <Camera size={20} />}
-                                <input type="file" className="hidden" onChange={uploadAvatar} disabled={uploading} accept="image/*" />
+                                <input type="file" className="hidden" onChange={handleUploadAvatar} disabled={uploading} accept="image/*" />
                             </label>
                         </div>
                     </div>
@@ -110,8 +117,8 @@ export default function SettingsPage() {
                             <label className="block text-sm font-medium text-gray-400 mb-2">ชื่อ - นามสกุล</label>
                             <input
                                 type="text"
-                                value={fullName}
-                                onChange={(e) => setFullName(e.target.value)}
+                                value={profile?.full_name || ""}
+                                onChange={(e) => setProfile(profile ? { ...profile, full_name: e.target.value } : null)}
                                 className="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 focus:border-blue-500 focus:outline-none transition-all"
                                 placeholder="ใส่ชื่อของคุณ..."
                             />

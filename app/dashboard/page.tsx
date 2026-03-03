@@ -5,13 +5,22 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { BookOpen, LineChart, Target, Trophy, ArrowRight, LayoutGrid } from "lucide-react";
+import { BookOpen, LineChart, Target, Trophy, ArrowRight, LayoutGrid, ShieldCheck } from "lucide-react";
 import Image from "next/image";
+import { getUserRole } from "@/lib/roles";
 
 export default function DashboardPage() {
     const [userEmail, setUserEmail] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
-    const [courses, setCourses] = useState<any[]>([]); // [เพิ่ม] เก็บรายชื่อคอร์ส
+    const [userRole, setUserRole] = useState("student");
+    interface Course {
+        id: string;
+        title: string;
+        description: string;
+        thumbnail_url: string;
+        access_level: string;
+    }
+    const [courses, setCourses] = useState<Course[]>([]); // [เพิ่ม] เก็บรายชื่อคอร์ส
     const [totalCourses, setTotalCourses] = useState(0);
     const [completedCourses, setCompletedCourses] = useState(0);
     const [progressPercentage, setProgressPercentage] = useState(0);
@@ -37,13 +46,16 @@ export default function DashboardPage() {
 
             try {
                 // [แก้ไข] ดึงข้อมูลคอร์สจริง และความคืบหน้าพร้อมกัน
-                const [coursesResponse, progressResponse] = await Promise.all([
+                const [coursesResponse, progressResponse, role] = await Promise.all([
                     supabase.from('courses').select('*').order('id', { ascending: true }),
-                    supabase.from('user_progress').select('*').eq('user_id', user.id).eq('status', 'completed')
+                    supabase.from('user_progress').select('*').eq('user_id', user.id).eq('status', 'completed'),
+                    getUserRole()
                 ]);
 
                 const allCourses = coursesResponse.data || [];
                 const completed = progressResponse.data?.length || 0;
+
+                setUserRole(role || "student");
 
                 setCourses(allCourses);
                 setTotalCourses(allCourses.length);
@@ -136,21 +148,35 @@ export default function DashboardPage() {
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {courses.map((course) => (
-                            <div
-                                key={course.id}
-                                onClick={() => router.push(`/courses/${course.id}`)}
-                                className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-500/50 hover:bg-gray-800/50 transition-all cursor-pointer group flex flex-col h-full"
-                            >
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover:scale-110 transition-transform">
-                                        <BookOpen className="w-6 h-6" />
+                            <div key={course.id} className="relative group">
+                                {/* ถ้าเป็นคอร์ส VIP และ User ไม่ใช่ VIP ให้โชว์ Lock Overlay */}
+                                {course.access_level === 'vip' && userRole !== 'admin' && userRole !== 'vip' && (
+                                    <div className="absolute inset-0 bg-gray-950/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center rounded-2xl border border-red-500/50">
+                                        <ShieldCheck size={40} className="text-red-500 mb-2" />
+                                        <p className="text-xs font-bold text-white uppercase tracking-widest">VIP Only Content</p>
+                                        <button onClick={() => router.push('/subscription')} className="mt-4 text-[10px] bg-red-600 px-4 py-2 rounded-lg font-bold">อัปเกรดเป็น VIP</button>
                                     </div>
-                                    <span className="text-xs font-mono text-gray-500">ID: {course.id}</span>
-                                </div>
-                                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-400 transition-colors">{course.title}</h3>
-                                <p className="text-gray-400 text-sm mb-6 line-clamp-2">{course.description}</p>
-                                <div className="mt-auto flex items-center text-blue-500 text-sm font-bold">
-                                    เริ่มเรียนเลย <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                )}
+
+                                <div
+                                    onClick={() => {
+                                        // ป้องกันการคลิกถ้าเป็น VIP แต่ไม่มีสิทธิ์
+                                        if (course.access_level === 'vip' && userRole !== 'admin' && userRole !== 'vip') return;
+                                        router.push(`/courses/${course.id}`);
+                                    }}
+                                    className="bg-gray-900 border border-gray-800 rounded-2xl p-6 hover:border-blue-500/50 hover:bg-gray-800/50 transition-all cursor-pointer group flex flex-col h-full"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="p-3 bg-blue-500/10 rounded-xl text-blue-400 group-hover:scale-110 transition-transform">
+                                            <BookOpen className="w-6 h-6" />
+                                        </div>
+                                        <span className="text-xs font-mono text-gray-500">ID: {course.id}</span>
+                                    </div>
+                                    <h3 className="text-lg font-bold mb-2 group-hover:text-blue-400 transition-colors">{course.title}</h3>
+                                    <p className="text-gray-400 text-sm mb-6 line-clamp-2">{course.description}</p>
+                                    <div className="mt-auto flex items-center text-blue-500 text-sm font-bold">
+                                        เริ่มเรียนเลย <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -187,7 +213,7 @@ export default function DashboardPage() {
                                 {/* โลโก้แบรนด์ด้านบน */}
                                 <div className="flex justify-center mb-10">
                                     <div className="bg-white p-4 rounded-2xl shadow-2xl">
-                                        <Image src="/logo.png" alt="CIS Logo" width={100} height={100} />
+                                        <Image src="/logo.jpg" alt="CIS Logo" width={100} height={100} />
                                     </div>
                                 </div>
 

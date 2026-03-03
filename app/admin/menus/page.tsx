@@ -5,17 +5,25 @@ import { createBrowserClient } from "@supabase/ssr";
 import { Settings, Plus, Trash2, Edit } from "lucide-react";
 
 export default function AdminMenuPage() {
-    const [menus, setMenus] = useState<any[]>([]);
+    interface MenuItem {
+        id: string;
+        label: string;
+        path: string;
+        required_role_id: number;
+        sort_order: number;
+    }
+    const [menus, setMenus] = useState<MenuItem[]>([]);
     const supabase = createBrowserClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!);
+
+    async function fetchMenus() {
+        const { data } = await supabase.from('menu_items').select('*').order('sort_order', { ascending: true });
+        setMenus(data || []);
+    }
 
     useEffect(() => {
         fetchMenus();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const fetchMenus = async () => {
-        const { data } = await supabase.from('menu_items').select('*').order('sort_order', { ascending: true });
-        setMenus(data || []);
-    };
 
     return (
         <div className="min-h-screen bg-gray-950 text-white p-8">

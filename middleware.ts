@@ -1,8 +1,9 @@
-import { createServerClient, type NextRequest } from '@supabase/ssr'
-import { NextResponse } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
+// และบรรทัดที่เกี่ยวกับ supabase ให้เหลือแค่
+import { createServerClient } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
-    let response = NextResponse.next({ request })
+    const response = NextResponse.next({ request })
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -35,7 +36,7 @@ export async function middleware(request: NextRequest) {
             .eq('user_id', user?.id)
             .single()
 
-        const roleName = (roleData as any)?.roles?.role_name
+        const roleName = (roleData as { roles: { role_name: string } | null } | null)?.roles?.role_name
         if (roleName !== 'admin') {
             return NextResponse.redirect(new URL('/dashboard', request.url))
         }

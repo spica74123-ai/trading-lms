@@ -50,9 +50,9 @@ export default function GlossaryPage() {
                     }));
                     setVocabularies(mappedData);
                 }
-            } catch (err: any) {
+            } catch (err: unknown) {
                 console.error("Error fetching vocabularies:", err);
-                setError(err.message || "Failed to load glossary data.");
+                setError(err instanceof Error ? err.message : "Failed to load glossary data.");
             } finally {
                 setIsLoading(false);
             }
@@ -89,7 +89,7 @@ export default function GlossaryPage() {
                     <span className="text-4xl mb-4 block">⚠️</span>
                     <h2 className="text-lg font-bold mb-2">Failed to load data</h2>
                     <p className="text-sm">{error}</p>
-                    <p className="text-xs text-red-400 mt-4">Check if the 'vocabularies' table exists in your Supabase project.</p>
+                    <p className="text-xs text-red-400 mt-4">Check if the &apos;vocabularies&apos; table exists in your Supabase project.</p>
                 </div>
             </div>
         );

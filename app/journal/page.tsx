@@ -6,7 +6,18 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export default function TradingJournal() {
-    const [trades, setTrades] = useState<any[]>([]);
+    interface Trade {
+        id: string;
+        pair: string;
+        side: string;
+        entry_price: number;
+        exit_price: number;
+        pnl: number;
+        comment: string;
+        chart_url?: string;
+        created_at: string;
+    }
+    const [trades, setTrades] = useState<Trade[]>([]);
     const [loading, setLoading] = useState(true);
     const [chartFile, setChartFile] = useState<File | null>(null);
     const [uploading, setUploading] = useState(false);
@@ -24,22 +35,24 @@ export default function TradingJournal() {
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
     );
 
-    useEffect(() => {
-        fetchTrades();
-    }, []);
-
-    const fetchTrades = async () => {
+    async function fetchTrades() {
         setLoading(true);
         const { data: { user } } = await supabase.auth.getUser();
         if (user) {
             const { data } = await supabase
                 .from("trading_journal")
                 .select("*")
+                .eq('user_id', user.id)
                 .order("created_at", { ascending: false });
             setTrades(data || []);
         }
         setLoading(false);
-    };
+    }
+
+    useEffect(() => {
+        fetchTrades();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -95,7 +108,7 @@ export default function TradingJournal() {
     };
 
     const totalTrades = trades.length;
-    const netPnL = trades.reduce((acc, trade) => acc + parseFloat(trade.pnl), 0);
+    const netPnL = trades.reduce((acc, trade) => acc + trade.pnl, 0);
     const winTrades = trades.filter(trade => trade.pnl > 0).length;
     const winRate = totalTrades > 0 ? (winTrades / totalTrades) * 100 : 0;
 
@@ -196,7 +209,7 @@ export default function TradingJournal() {
                                             <td className="p-4 font-bold">{trade.pair}</td>
                                             <td className={`p-4 font-bold ${trade.side === 'BUY' ? 'text-blue-400' : 'text-orange-400'}`}>{trade.side}</td>
                                             <td className={`p-4 font-bold ${trade.pnl >= 0 ? 'text-emerald-400' : 'text-red-400'}`}>
-                                                {trade.pnl >= 0 ? '+' : ''}{parseFloat(trade.pnl).toFixed(2)}
+                                                {trade.pnl >= 0 ? '+' : ''}{trade.pnl.toFixed(2)}
                                             </td>
                                             <td className="p-4">
                                                 {trade.chart_url ? (
