@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createBrowserClient } from "@supabase/ssr";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { BookOpen, LineChart, Target, Trophy, ArrowRight, LayoutGrid, ShieldCheck } from "lucide-react";
+import { BookOpen, LineChart, Target, Trophy, ArrowRight, LayoutGrid, ShieldCheck, Video } from "lucide-react";
 import Image from "next/image";
 import { getUserRole } from "@/lib/roles";
 import DashboardHeader from "@/components/DashboardHeader";
@@ -134,6 +134,30 @@ export default function DashboardPage() {
                         </p>
                     </div>
                 </div>
+
+                {/* Upcoming Live Section */}
+                <section className="mb-12">
+                    <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Next Live Session</h3>
+                    <div className="bg-gradient-to-r from-blue-900/40 to-red-900/40 border border-white/10 p-8 rounded-[2.5rem] flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group">
+                        <div className="relative z-10">
+                            <div className="flex items-center gap-2 text-red-500 mb-2 animate-pulse">
+                                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                <span className="text-[10px] font-black uppercase tracking-widest">Live Soon</span>
+                            </div>
+                            <h2 className="text-2xl font-black mb-1">Live Trading: US Session Analysis</h2>
+                            <p className="text-gray-400 text-sm font-light">3 มีนาคม 2026 | 20:30 น. เป็นต้นไป</p>
+                        </div>
+
+                        <button className="relative z-10 px-8 py-4 bg-white text-black rounded-2xl font-black hover:scale-105 transition-transform flex items-center gap-2">
+                            <Video size={18} /> เข้าสู่ห้องเรียนสด
+                        </button>
+
+                        {/* Background Decor */}
+                        <div className="absolute top-0 right-0 p-10 opacity-5 group-hover:opacity-10 transition-opacity">
+                            <img src="/logo.jpg" className="w-32" alt="CIS Logo" />
+                        </div>
+                    </div>
+                </section>
 
                 {/* Course Grid - [จุดที่ดึงข้อมูลจาก DB มาวนลูป] */}
                 <section>
